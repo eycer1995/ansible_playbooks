@@ -3,27 +3,25 @@
   hosts: all
   become: true
   
+  pre_tasks:
+   - name: Update apt cache if needed
+     apt: 
+       update_cache: true
+       cache_valid_time: 3600
+
   tasks: 
     - name: Install Apache.
-      ansible.builtin.apt:
+      apt:
         name: apache2
         state: present
 
     - name: Copy configuration files.
       copy:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-        owner: root
-        group: root
-        mode: 0644
-      with_items:
-        - src: httpd.conf
-          dest: /etc/httpd/conf/httpd.conf
-        - src: httpd-vhosts.conf
-          dest: /etc/httpd/conf/httpd-vhosts.conf
+        src: apache2.conf
+        dest: /etc/apache2/apache2.conf
     
     - name: Make sure apache is started now and at boot
       service:
-        name: httpd
+        name: apache2
         state: started
-        enable: true
+        enabled: true
