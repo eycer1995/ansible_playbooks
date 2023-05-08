@@ -9,6 +9,12 @@
        update_cache: true
        cache_valid_time: 3600
 
+  handlers:
+   - name: restart apache2
+     service:
+       name: apache2
+       state: restarted
+
   tasks: 
     - name: Install Apache.
       apt:
@@ -19,7 +25,8 @@
       copy:
         src: apache2.conf
         dest: /etc/apache2/apache2.conf
-    
+      notify: restart apache2
+
     - name: Make sure apache is started now and at boot
       service:
         name: apache2

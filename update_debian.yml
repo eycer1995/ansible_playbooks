@@ -1,0 +1,36 @@
+---
+- name: Update Debian 11
+  hosts: test
+  become: yes
+
+
+  handlers:
+    - name: wait server
+      wait_for_connection:
+        timeout: 360
+        delay: 10
+
+    - name: server running
+      debug:
+        msg: "Server is back and running"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: yes
+
+    - name: Reboot the server
+      reboot:
+        reboot_timeout: 300
+        post_reboot_delay: 60
+        notify: wait server
+
+    - name: Check connectivity to the server
+      ping:
+      notify: server running
+
