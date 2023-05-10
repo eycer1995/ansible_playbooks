@@ -5,30 +5,35 @@
   
   pre_tasks:
    - name: Update apt cache if needed
-     apt: 
+     package: 
        update_cache: true
-       cache_valid_time: 3600
+
+   - name: Load variable files.
+     include_vars: "{{ item }}"
+     with_first_found:
+       - "vars/apache_{{ ansible_os_family }}.yml"
+       - "vars/apache_default.yml"
 
   handlers:
    - name: restart apache2
      service:
-       name: apache2
+       name: "{{ apache_service }}"
        state: restarted
 
   tasks: 
     - name: Install Apache.
-      apt:
-        name: apache2
+      package:
+        name: "{{ apache_package }}"
         state: present
 
     - name: Copy configuration files.
       copy:
         src: apache2.conf
-        dest: /etc/apache2/apache2.conf
+        dest: "{{ apache_config_dir }}/apache2.conf"
       notify: restart apache2
 
     - name: Make sure apache is started now and at boot
       service:
-        name: apache2
+        name: "{{ apache_service }}"
         state: started
         enabled: true
