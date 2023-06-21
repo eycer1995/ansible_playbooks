@@ -1,0 +1,58 @@
+---
+- name: "Playbook to install all home media server containers"
+  hosts: test
+  vars:
+    homedir: /home/eycer
+    container_registry: docker.io/library
+
+  pre_tasks:
+   - name: Update apt cache if needed
+     package:
+       update_cache: true
+     become: true
+
+   - name: Create folders
+     ansible.builtin.file:
+       path: /opt/jellyfin/config
+       state: directory
+       owner: eycer
+       group: eycer
+       mode: '0755'
+     become: true
+
+  tasks:
+    - name: Install podman
+      ansible.builtin.package:
+        name: podman
+        state: present
+      become: true
+    
+    - name: Configure cgroup
+      ansible.builtin.blockinfile:
+        path: /etc/containers/containers.conf
+        block: |
+          [engine]
+          cgroup_manager = "cgroupfs"
+          events_logger = "file"
+      become: true
+
+
+    - name: Create mediapod
+      containers.podman.podman_pod:
+        name: mediapod
+        state: created
+        ports:
+          - "8096:8096"
+
+    - name: Create and start jellyfin
+      containers.podman.podman_container:
+        name: jellyfin
+        image: lscr.io/linuxserver/jellyfin:latest
+        pod: mediapod
+        volume: 
+          - /opt/jellyfin/config:/config
+        env:
+            PUID: 1000
+            PGID: 1000
+            TZ: America/Argentina/Buenos_Aires
+        state: started
