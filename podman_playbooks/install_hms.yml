@@ -1,9 +1,6 @@
 ---
 - name: "Playbook to install all home media server containers"
   hosts: test
-  vars:
-    homedir: /home/eycer
-    container_registry: docker.io/library
 
   pre_tasks:
    - name: Update apt cache if needed
@@ -11,13 +8,29 @@
        update_cache: true
      become: true
 
-   - name: Create folders
+   - name: Create folders structure
      ansible.builtin.file:
-       path: /opt/jellyfin/config
+       path: "{{ item }}"
        state: directory
        owner: eycer
        group: eycer
        mode: '0755'
+
+     loop:
+       - /opt/jellyfin/config
+       - /opt/jellyfin/tvshows
+       - /opt/jellyfin/anime
+       - /opt/jellyfin/movies
+       - /opt/jellyfin/animovies
+       - /opt/jellyfin/kdrama
+       - /opt/transmission/config
+       - /opt/transmission/downloads
+       - /opt/transmission/watch
+       - /opt/sonarr/config
+       - /opt/radarr/config
+       - /opt/bazarr/config
+       - /opt/jackett/config
+       - /opt/jellyseerr/config
      become: true
 
   tasks:
@@ -26,7 +39,16 @@
         name: podman
         state: present
       become: true
-    
+   
+    - name: Create containers.conf
+      ansible.builtin.file:
+        path: /etc/containers/containers.conf
+        state: touch
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+
     - name: Configure cgroup
       ansible.builtin.blockinfile:
         path: /etc/containers/containers.conf
@@ -37,22 +59,43 @@
       become: true
 
 
-    - name: Create mediapod
+    - name: Create mediapod pod
       containers.podman.podman_pod:
         name: mediapod
         state: created
         ports:
           - "8096:8096"
 
-    - name: Create and start jellyfin
+    - name: Create jellyfin container
       containers.podman.podman_container:
         name: jellyfin
         image: lscr.io/linuxserver/jellyfin:latest
         pod: mediapod
         volume: 
           - /opt/jellyfin/config:/config
+          - /opt/jellyfin/tvshows:/data/tvshows
+          - /opt/jellyfin/anime:/data/anime
+          - /opt/jellyfin/movies:/data/movies
+          - /opt/jellyfin/animovies:/data/animovies
+          - /opt/jellyfin/kdrama:/data/kdrama
         env:
             PUID: 1000
             PGID: 1000
             TZ: America/Argentina/Buenos_Aires
+        label: "io.containers.autoupdate=image"
+        state: created
+
+    - name: Create systemd service for mediapod
+      containers.podman.podman_generate_systemd:
+        name: mediapod
+        new: true
+        dest: ~/.config/systemd/user
+
+    - name: Start the mediapod service
+      ansible.builtin.systemd:
+        name: pod-mediapod.service
+        daemon_reload: true
+        scope: user
         state: started
+        enabled: true
+        

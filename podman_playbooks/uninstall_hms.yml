@@ -1,0 +1,26 @@
+---
+- name: "Playbook to remove all home media server containers"
+  hosts: test
+
+  tasks:
+    - name: Retrieve home directory
+      set_fact:
+        home_dir: "{{ lookup('env','HOME') }}"
+
+    - name: Stop the mediapod service
+      ansible.builtin.systemd:
+        name: pod-mediapod.service
+        scope: user
+        state: stopped
+        enabled: true
+
+    - name: Clean systemd folder
+      ansible.builtin.file:
+        path: "{{ home_dir }}/.config/systemd/user"
+        state: absent
+        recurse: yes
+
+    - name: Remove mediapod pod
+      containers.podman.podman_pod:
+        name: mediapod
+        state: absent

@@ -2,7 +2,7 @@
 rpi01		ansible_host=192.168.0.101	ansible_ssh_private_key_file=~/.ssh/rpi01
 debpod01	ansible_host=192.168.0.18	ansible_ssh_private_key_file=~/.ssh/debpod01
 cmkmon01	ansible_host=192.168.0.20	ansible_ssh_private_key_file=~/.ssh/cmkmon01
-octopi		ansible_host=192.168.0.98	ansible_ssh_private_key_file=~/.ssh/octopi
+#octopi		ansible_host=192.168.0.98	ansible_ssh_private_key_file=~/.ssh/octopi
 
 [test]
 deb01		ansible_host=192.168.0.30	ansible_ssh_private_key_file=~/.ssh/deb01
