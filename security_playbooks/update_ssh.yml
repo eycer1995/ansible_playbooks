@@ -1,0 +1,65 @@
+---
+- hosts: test
+  become: true
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: sshd
+        state: restarted
+
+  tasks:
+    - name: Update SSH config.
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+        validate: 'sshd -T -f %s'
+      loop:
+        - regexp: "^PasswordAuthentication"
+          line: "PasswordAuthentication no"
+        - regexp: "^PermitRootLogin"
+          line: "PermitRootLogin no"
+      notify: restart ssh
+
+    - name: Add user eycer.
+      user:
+        name: eycer
+
+    - name: Add sudo group rights for deployment user.
+      lineinfile:
+        dest: /etc/sudoers
+        regexp: "^eycer"
+        line: "eycer ALL=(ALL) NOPASSWD:ALL"
+        state: present
+        validate: 'visudo -cf %s'
+
+    - name: Install ufw
+      package:
+        name: ufw
+        state: present
+
+    - name: Disable IPv6 rules in ufw.
+      lineinfile:
+        dest: /etc/default/ufw
+        regexp: "^IPV6"
+        line: "IPV6=no"
+        state: present
+ 
+    - name: Allow OpenSSH
+      ufw:
+        rule: allow
+        name: OpenSSH
+
+    - name: Set ufw default policies
+      ufw:
+        rule: "{{ item.rule }}"
+        direction: "{{ item.direction }}"
+      loop:
+        - { rule: "deny", direction: "in" }
+        - { rule: "allow", direction: "out" }
+
+    - name: Enable ufw
+      ufw:
+        state: enabled

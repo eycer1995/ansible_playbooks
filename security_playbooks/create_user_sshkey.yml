@@ -1,0 +1,49 @@
+---
+- name: Create user and sshkey
+  hosts: test
+  vars:
+    newuser: eycer
+    ssh_path: /home/eycer/.ssh/
+
+  tasks: 
+    - name: Create user with sshkey.
+      ansible.builtin.user:
+        name: "{{ newuser }}"
+        shell: /bin/bash
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: ".ssh/{{ newuser }}_{{ ansible_facts['nodename'] }}"
+      become: true
+
+    - name: Copy private key
+      ansible.builtin.fetch:
+        src: "/home/{{ newuser }}/.ssh/{{ newuser }}_{{ ansible_facts['nodename'] }}"
+        dest: "{{ ssh_path }}"
+        flat: yes
+      become: true
+
+    - name: Set private key to 600 in localhost
+      ansible.builtin.file:
+        path: /home/eycer/.ssh/{{ newuser }}_{{ ansible_facts['nodename'] }}
+        mode: "u=rw,g=,o="
+      delegate_to: localhost
+
+    - name: Copy pubic key
+      ansible.builtin.fetch:
+        src: "/home/{{ newuser }}/.ssh/{{ newuser }}_{{ ansible_facts['nodename'] }}.pub"
+        dest: "{{ ssh_path }}"
+        flat: yes
+
+    - name: Delete private key on remote
+      ansible.builtin.file:
+        path: "/home/{{ newuser }}/.ssh/{{ newuser }}_{{ ansible_facts['nodename'] }}"
+        state: absent
+      become: true
+
+    # key location is from the local host and you need superuser to authorize the key in the remote client
+    - name: Authorize the ssh key
+      ansible.posix.authorized_key:
+        user: "{{ newuser }}"
+        state: present
+        key: "{{ lookup('file', ssh_path + newuser + '_' + ansible_facts['nodename'] + '.pub') }}"
+      become: true
