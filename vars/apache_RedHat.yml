@@ -1,4 +1,0 @@
----
-apache_service: httpd
-apache_package: httpd
-apache_config_dir: /etc/httpd/conf.d
