@@ -1,0 +1,19 @@
+collections:
+  # Install a collection from Ansible Galaxy.
+  - name: community.general
+    version: ">=7.1.0"
+    source: https://galaxy.ansible.com
+  
+  - name: ansible.posix
+    version: ">=1.5.4"
+    source: https://galaxy.ansible.com
+ 
+  - name: containers.podman
+    version: ">=1.10.2"
+    source: https://galaxy.ansible.com
+
+
+
+
+
+
