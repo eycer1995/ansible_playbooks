@@ -1,0 +1,19 @@
+---
+- name: Clean cache files in /var
+  hosts: test
+  become: yes
+
+  tasks:
+    - name: Get list of files in /opt/logs
+      find:
+        paths: "/opt/logs"
+        patterns: "*"
+        file_type: any
+      register: files_to_delete
+
+    - name: Delete contents of /opt/logs
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ files_to_delete.files }}"
+
