@@ -1,6 +1,9 @@
 ---
-- hosts: test
+- hosts: all
   become: true
+
+  vars:
+    ssh_path: /home/eycer/.ssh/
 
   handlers:
     - name: restart ssh
@@ -23,6 +26,9 @@
           line: "PermitRootLogin no"
       notify: restart ssh
 
+    - name: Make sure handlers are flushed.
+      meta: flush_handlers
+
     - name: Add user eycer.
       user:
         name: eycer
@@ -34,6 +40,13 @@
         line: "eycer ALL=(ALL) NOPASSWD:ALL"
         state: present
         validate: 'visudo -cf %s'
+
+    # Add master key
+    - name: Authorize the ssh key
+      ansible.posix.authorized_key:
+        user: eycer
+        state: present
+        key: "{{ lookup('file', ssh_path + 'master_key.pub') }}"
 
     - name: Install ufw
       package:
