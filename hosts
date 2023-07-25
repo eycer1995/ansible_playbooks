@@ -14,4 +14,5 @@ deb01		ansible_host=192.168.0.30	ansible_ssh_private_key_file=~/.ssh/deb01
 deb02		ansible_host=192.168.0.31	ansible_ssh_private_key_file=~/.ssh/deb02
 deb03		ansible_host=192.168.0.32   ansible_ssh_private_key_file=~/.ssh/deb03
 centos01	ansible_host=192.168.0.40	ansible_ssh_private_key_file=~/.ssh/centos01
+rocky1	    ansible_host=192.168.0.34   ansible_ssh_private_key_file=~/.ssh/master_key	
 

@@ -1,0 +1,33 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Install ufw
+      package:
+        name: ufw
+        state: present
+
+    - name: Disable IPv6 rules in ufw.
+      lineinfile:
+        dest: /etc/default/ufw
+        regexp: "^IPV6"
+        line: "IPV6=no"
+        state: present
+ 
+    - name: Allow OpenSSH in ufw
+      ufw:
+        rule: allow
+        name: OpenSSH
+
+    - name: Set ufw default policies
+      ufw:
+        rule: "{{ item.rule }}"
+        direction: "{{ item.direction }}"
+      loop:
+        - { rule: "deny", direction: "in" }
+        - { rule: "allow", direction: "out" }
+
+    - name: Enable ufw
+      ufw:
+        state: enabled
