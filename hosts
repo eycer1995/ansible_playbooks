@@ -1,18 +1,30 @@
 [homelab]
-rpi01		ansible_host=192.168.0.101	ansible_ssh_private_key_file=~/.ssh/rpi01
-debpod01	ansible_host=192.168.0.18	ansible_ssh_private_key_file=~/.ssh/debpod01
-cmkmon01	ansible_host=192.168.0.20	ansible_ssh_private_key_file=~/.ssh/cmkmon01
-stgminecraft ansible_host=192.168.0.28  ansible_ssh_private_key_file=~/.ssh/master_key
+rpi01			ansible_host=192.168.0.101	
+debpod01		ansible_host=192.168.0.18	
+cmkmon01		ansible_host=192.168.0.20	
+stgminecraft	ansible_host=192.168.0.28  
+kavita			ansible_host=192.168.0.24
+mediastage		ansible_host=192.168.0.22
+proxmox			ansible_host=192.168.0.104
 
-#octopi		ansible_host=192.168.0.98	ansible_ssh_private_key_file=~/.ssh/octopi
-
-
-
+[lxc]
+privseedbox		ansible_host=192.168.0.23
+wireguard		ansible_host=192.168.0.26
+pihole			ansible_host=192.168.0.157
+npm				ansible_host=192.168.0.21
 
 [test]
-deb01		ansible_host=192.168.0.30	ansible_ssh_private_key_file=~/.ssh/deb01
-deb02		ansible_host=192.168.0.31	ansible_ssh_private_key_file=~/.ssh/deb02
-deb03		ansible_host=192.168.0.32   ansible_ssh_private_key_file=~/.ssh/deb03
-centos01	ansible_host=192.168.0.40	ansible_ssh_private_key_file=~/.ssh/centos01
-rocky1	    ansible_host=192.168.0.34   ansible_ssh_private_key_file=~/.ssh/master_key	
+deb01		ansible_host=192.168.0.30
+deb02		ansible_host=192.168.0.31
+deb03		ansible_host=192.168.0.32
+centos01	ansible_host=192.168.0.40
+rocky1	    ansible_host=192.168.0.34
 
+[homelab:vars]
+ansible_ssh_private_key_file=~/.ssh/master_key
+
+[lxc:vars]
+ansible_ssh_private_key_file=~/.ssh/master_key
+
+[test:vars]
+ansible_ssh_private_key_file=~/.ssh/master_key
