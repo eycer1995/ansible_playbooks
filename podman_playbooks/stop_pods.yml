@@ -1,0 +1,36 @@
+---
+- name: Stop all Podman containers and pods
+  hosts: homelab
+  become: true
+  become_user: eycer
+  tasks:
+    - name: Gather Podman container facts
+      containers.podman.podman_container_info:
+      register: podman_containers
+
+    - name: Debug Podman container info
+      ansible.builtin.debug:
+        var: podman_containers.containers
+
+    - name: Stop all running Podman containers
+      containers.podman.podman_container:
+        name: "{{ item.Name }}"
+        state: stopped
+      loop: "{{ podman_containers.containers }}"
+      when: podman_containers.containers is defined and podman_containers.containers | length > 0
+
+    - name: Gather Podman pod facts
+      containers.podman.podman_pod_info:
+      register: podman_pods
+
+    - name: Debug Podman container info
+      ansible.builtin.debug:
+        var: podman_pods.containers
+
+    - name: Stop all running Podman pods
+      containers.podman.podman_pod:
+        name: "{{ item.Name }}"
+        state: stopped
+      loop: "{{ podman_pods.pods }}"
+      when: podman_pods.pods is defined and podman_pods.pods | length > 0
+

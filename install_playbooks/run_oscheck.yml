@@ -1,0 +1,16 @@
+---
+- name: Install Apache
+  hosts: all
+  become: true
+  
+  tasks: 
+    - name: Copy os-check.sh.
+      copy: 
+        src: /home/eycer/Documents/github/scripts/os-checkout.sh
+        dest: /home/eycer/os-checkout.sh
+        mode: '0755'
+
+    - name: Run os-check.sh
+      shell: '/home/eycer/os-checkout.sh > /tmp/precheck'
+
+

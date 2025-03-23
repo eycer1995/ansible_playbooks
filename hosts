@@ -1,30 +1,22 @@
 [homelab]
-rpi01			ansible_host=192.168.0.101	
-debpod01		ansible_host=192.168.0.18	
-cmkmon01		ansible_host=192.168.0.20	
-stgminecraft	ansible_host=192.168.0.28  
-kavita			ansible_host=192.168.0.24
-mediastage		ansible_host=192.168.0.22
-proxmox			ansible_host=192.168.0.104
+rpi01			ansible_host=192.168.1.101	
+debpod01		ansible_host=192.168.1.18	
+kavita			ansible_host=192.168.1.24
+mediastage		ansible_host=192.168.1.22
+proxmox			ansible_host=192.168.1.104
+immich			ansible_host=192.168.1.33
+
 
 [lxc]
-privseedbox		ansible_host=192.168.0.23
-wireguard		ansible_host=192.168.0.26
-pihole			ansible_host=192.168.0.157
-npm				ansible_host=192.168.0.21
+seedbox			ansible_host=192.168.1.23
+wireguard		ansible_host=192.168.1.26
+pihole			ansible_host=192.168.1.157
+npm				ansible_host=192.168.1.21
+seedbox			ansible_host=192.168.1.52
+samba			ansible_host=192.168.1.32
+n8n				ansible_host=192.168.1.53
 
 [test]
-deb01		ansible_host=192.168.0.30
-deb02		ansible_host=192.168.0.31
-deb03		ansible_host=192.168.0.32
-centos01	ansible_host=192.168.0.40
-rocky1	    ansible_host=192.168.0.34
-
-[homelab:vars]
-ansible_ssh_private_key_file=~/.ssh/master_key
-
-[lxc:vars]
-ansible_ssh_private_key_file=~/.ssh/master_key
-
-[test:vars]
-ansible_ssh_private_key_file=~/.ssh/master_key
+centos01	ansible_host=192.168.1.40
+rocky1	    ansible_host=192.168.1.34
+docker-template ansible_hosts=192.168.1.50

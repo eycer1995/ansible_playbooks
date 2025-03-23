@@ -1,0 +1,16 @@
+---
+- hosts: test
+
+  tasks:
+    - name: Register uptime.
+      command: uptime
+      register: system_uptime
+
+    - name: Print the registered uptime.
+      debug:
+        var: system_uptime.stdout
+
+    - name: Print a message if a command resulted in a changed.
+      debug:
+        msg: "Command resulted in a change"
+      when: system_uptime is changed
